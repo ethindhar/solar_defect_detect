@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Panel Damage Detection</title>
+    <link rel="stylesheet" href="../static/index.css">
+</head>
+<body>
+    <h1>Upload an Image of Solar Panel</h1>
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+        <label for="file">Choose image:</label>
+        <input type="file" name="file" accept="image/*" required>
+        <button type="submit">Predict</button>
+    </form>
+
+    <br>
+    <div id="prediction-result"></div>
+
+    <script>
+        // Optional: Handle the form submission and display the result dynamically
+        const form = document.querySelector('form');
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            const resultDiv = document.getElementById('prediction-result');
+
+            if (data.predicted_class) {
+                resultDiv.innerHTML = `
+                    <h2>Prediction Result:</h2>
+                    <p>Predicted Class: ${data.predicted_class}</p>
+                    <p>Confidence: ${(data.confidence * 100).toFixed(2)}%</p>
+                `;
+            } else {
+                resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
